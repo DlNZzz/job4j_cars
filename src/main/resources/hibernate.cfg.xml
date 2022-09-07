@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://127.0.0.1:5432/hibernate</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://127.0.0.1:5432/job4j_cars</property>
         <property name="hibernate.connection.username">postgres</property>
         <property name="hibernate.connection.password">password</property>
         <property name="hibernate.connection.pool_size">1</property>
@@ -13,9 +13,10 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <property name="hibernate.jdbc.time_zone">Asia/Tokyo</property>
-        <mapping class="ru.job4j.cars.Car"/>
-        <mapping class="ru.job4j.cars.Driver"/>
-        <mapping class="ru.job4j.cars.Engine"/>
+        <!--property name="hibernate.jdbc.time_zone">Asia/Tokyo</property-->
+        <mapping class="ru.job4j.cars.model.Car"/>
+        <mapping class="ru.job4j.cars.model.Driver"/>
+        <mapping class="ru.job4j.cars.model.Engine"/>
+        <mapping class="ru.job4j.cars.model.User"/>
     </session-factory>
 </hibernate-configuration>
