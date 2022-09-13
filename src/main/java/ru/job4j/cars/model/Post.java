@@ -1,11 +1,13 @@
 package ru.job4j.cars.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "auto_post")
 public class Post {
@@ -14,8 +16,13 @@ public class Post {
     private int id;
     private String text;
     private Timestamp created;
-    private int auto_user_id;
-    private int car_id;
+    private byte[] photo;
+    @ManyToOne()
+    @JoinColumn(name = "auto_user_id")
+    private Driver driver;
+    @OneToOne()
+    @JoinColumn(name = "car_id")
+    private Car car;
 
     public int getId() {
         return id;

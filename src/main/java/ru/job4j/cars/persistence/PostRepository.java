@@ -10,15 +10,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.Function;
 
-/*
-В нем через Hibernate на HQL напишите три метода для извлечения данных.
-
-- показать объявления за последний день;
-
-- показать объявления с фото;
-
-- показать объявления определенной марки.
- */
 public class PostRepository {
     private final SessionFactory sessionFactory;
 
@@ -38,14 +29,15 @@ public class PostRepository {
 
     public Collection<Post> findLastDay() {
         return this.tx(
-                session -> session.createQuery("")
+                session -> session.createQuery("from Post p where p.photo >= 0")
                         .list()
         );
     }
 
-    public Collection<Post> findMark(String brand) {
+    public Collection<Post> findBrand(String brand) {
         return this.tx(
-                session -> session.createQuery("")
+                session -> session.createQuery("from Post p join p.car car where car.brand = :brand")
+                        .setParameter("brand", brand)
                         .list()
         );
     }

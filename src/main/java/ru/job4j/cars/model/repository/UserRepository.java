@@ -3,17 +3,18 @@ package ru.job4j.cars.model.repository;
 import lombok.AllArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import ru.job4j.cars.model.User;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @AllArgsConstructor
 public class UserRepository {
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     /**
      * Сохранить в базе.
@@ -21,9 +22,7 @@ public class UserRepository {
      * @return пользователь с id.
      */
     public User create(User user) {
-        this.tx(
-                session -> session.save(user)
-        );
+        crudRepository.run(session -> session.persist(user));
         return user;
     }
 
@@ -32,12 +31,7 @@ public class UserRepository {
      * @param user пользователь.
      */
     public void update(User user) {
-        this.tx(
-                session -> {
-                    session.update(user);
-                    return null;
-                }
-        );
+        crudRepository.run(session -> session.merge(user));
     }
 
     /**
@@ -45,13 +39,9 @@ public class UserRepository {
      * @param userId ID
      */
     public void delete(int userId) {
-        this.tx(
-                session -> {
-                    User user = new User();
-                    user.setId(userId);
-                    session.delete(user);
-                    return null;
-                }
+        crudRepository.run(
+                "delete from User where id = :fId",
+                Map.of("fId", userId)
         );
     }
 
@@ -60,17 +50,18 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findAllOrderById() {
-        return this.tx(session -> session.createQuery("from User").list());
+        return crudRepository.query("from User", User.class);
     }
 
     /**
      * Найти пользователя по ID
      * @return пользователь.
      */
-    public Optional<User> findById(int id) {
-        return Optional.of(this.tx(
-                session -> session.get(User.class, id)
-                ));
+    public Optional<User> findById(int userId) {
+        return crudRepository.optional(
+                "from User where id = :fId", User.class,
+                Map.of("fId", userId)
+        );
     }
 
     /**
@@ -79,11 +70,10 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findByLikeLogin(String key) {
-        return this.tx(session -> {
-            Query query = session.createQuery("from User u where u.login like :key");
-            query.setParameter("key", "%" + key + "%");
-            return query.list();
-        });
+        return crudRepository.query(
+                "from User where login like :fKey", User.class,
+                Map.of("fKey", "%" + key + "%")
+        );
     }
 
     /**
@@ -92,25 +82,9 @@ public class UserRepository {
      * @return Optional or user.
      */
     public Optional<User> findByLogin(String login) {
-        return this.tx(session -> {
-            Query query = session.createQuery("from User where login = :login");
-            query.setParameter("login", login);
-            return query.setFirstResult(0).setMaxResults(1).uniqueResultOptional();
-        });
-    }
-
-    private <T> T tx(final Function<Session, T> command) {
-        final Session session = sf.openSession();
-        final Transaction tx = session.beginTransaction();
-        try {
-            T rsl = command.apply(session);
-            tx.commit();
-            return rsl;
-        } catch (final Exception e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
+        return crudRepository.optional(
+                "from User where login = :fLogin", User.class,
+                Map.of("fLogin", login)
+        );
     }
 }
