@@ -1,5 +1,6 @@
 package ru.job4j.cars.persistence;
 
+import lombok.AllArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -10,12 +11,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.Function;
 
+@AllArgsConstructor
 public class PostRepository {
     private final SessionFactory sessionFactory;
-
-    public PostRepository(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 
     public Collection<Post> findAvailabilityOfPhotos() {
         return this.tx(
